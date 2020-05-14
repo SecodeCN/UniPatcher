@@ -908,7 +908,7 @@ namespace UniPatcher
 			base.Controls.Add(this.label1);
 			this.Font = new Font("Arial", 12f, FontStyle.Regular, GraphicsUnit.Point, 0);
 			base.FormBorderStyle = FormBorderStyle.FixedSingle;
-			base.Icon = (Icon)componentResourceManager.GetObject("$this.Icon");
+			//base.Icon = (Icon)componentResourceManager.GetObject("$this.Icon");
 			base.Margin = new Padding(4);
 			base.MaximizeBox = false;
 			base.MinimizeBox = false;
