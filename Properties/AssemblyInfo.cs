@@ -9,7 +9,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: AssemblyProduct("UniPatcher")]

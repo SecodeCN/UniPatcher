@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace UniPatcher
 {
@@ -19,21 +14,795 @@ namespace UniPatcher
     {
         private string appPath = "C:";
 
-        private int patchAs;
+        private int patchAs = 2019;
+
+        #region �滻ֵ
+        private static readonly byte[] Fin1 = new byte[]
+        {
+            103,
+            101,
+            116,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            73,
+            110,
+            102,
+            111,
+            40,
+            99,
+            97,
+            108,
+            108,
+            98,
+            97,
+            99,
+            107,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            47,
+            47,
+            32,
+            108,
+            111,
+            97,
+            100,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            47,
+            47,
+            32,
+            103,
+            101,
+            116,
+            32,
+            108,
+            97,
+            116,
+            101,
+            115,
+            116,
+            32,
+            100,
+            97,
+            116,
+            97,
+            32,
+            102,
+            114,
+            111,
+            109,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            67,
+            111,
+            114,
+            101,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            73,
+            110,
+            102,
+            111,
+            46,
+            97,
+            99,
+            116,
+            105,
+            118,
+            97,
+            116,
+            101,
+            100,
+            32,
+            61,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            67
+        };
+
+        private static readonly byte[] Rep1 = new byte[]
+        {
+            103,
+            101,
+            116,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            73,
+            110,
+            102,
+            111,
+            40,
+            99,
+            97,
+            108,
+            108,
+            98,
+            97,
+            99,
+            107,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            47,
+            47,
+            32,
+            108,
+            111,
+            97,
+            100,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            47,
+            47,
+            32,
+            103,
+            101,
+            116,
+            32,
+            108,
+            97,
+            116,
+            101,
+            115,
+            116,
+            32,
+            100,
+            97,
+            116,
+            97,
+            32,
+            102,
+            114,
+            111,
+            109,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            67,
+            111,
+            114,
+            101,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            73,
+            110,
+            102,
+            111,
+            46,
+            97,
+            99,
+            116,
+            105,
+            118,
+            97,
+            116,
+            101,
+            100,
+            32,
+            61,
+            32,
+            32,
+            116,
+            114,
+            117,
+            101,
+            59,
+            47,
+            47
+        };
+
+        private static readonly byte[] Fin2 = new byte[]
+        {
+            118,
+            101,
+            114,
+            105,
+            102,
+            121,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            68,
+            97,
+            116,
+            97,
+            40,
+            120,
+            109,
+            108,
+            44,
+            32,
+            110,
+            101,
+            119,
+            102,
+            105,
+            108,
+            101,
+            32,
+            61,
+            32,
+            102,
+            97,
+            108,
+            115,
+            101,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            116,
+            117,
+            114,
+            110,
+            32,
+            110,
+            101,
+            119,
+            32,
+            80,
+            114,
+            111,
+            109,
+            105,
+            115,
+            101,
+            40,
+            40,
+            114,
+            101,
+            115,
+            111,
+            108,
+            118,
+            101,
+            44,
+            32,
+            114,
+            101,
+            106,
+            101,
+            99,
+            116,
+            41,
+            32,
+            61,
+            62,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            105,
+            102,
+            32,
+            40,
+            120,
+            109,
+            108,
+            32,
+            61,
+            61,
+            61,
+            32,
+            39,
+            39,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            116,
+            104,
+            105,
+            115,
+            46,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            83,
+            116,
+            97,
+            116,
+            117,
+            115,
+            32,
+            61,
+            32,
+            76,
+            73,
+            67,
+            69,
+            78,
+            83,
+            69,
+            95,
+            83,
+            84,
+            65,
+            84,
+            85,
+            83,
+            46,
+            107,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            69,
+            114,
+            114,
+            111,
+            114,
+            70,
+            108,
+            97,
+            103,
+            95,
+            78,
+            111,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            106,
+            101,
+            99,
+            116,
+            40,
+            41,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            116,
+            117,
+            114,
+            110,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            125
+        };
+
+        private static readonly byte[] Rep2 = new byte[]
+        {
+            118,
+            101,
+            114,
+            105,
+            102,
+            121,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            68,
+            97,
+            116,
+            97,
+            40,
+            120,
+            109,
+            108,
+            44,
+            32,
+            110,
+            101,
+            119,
+            102,
+            105,
+            108,
+            101,
+            32,
+            61,
+            32,
+            102,
+            97,
+            108,
+            115,
+            101,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            116,
+            117,
+            114,
+            110,
+            32,
+            110,
+            101,
+            119,
+            32,
+            80,
+            114,
+            111,
+            109,
+            105,
+            115,
+            101,
+            40,
+            40,
+            114,
+            101,
+            115,
+            111,
+            108,
+            118,
+            101,
+            44,
+            32,
+            114,
+            101,
+            106,
+            101,
+            99,
+            116,
+            41,
+            32,
+            61,
+            62,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            114,
+            101,
+            115,
+            111,
+            108,
+            118,
+            101,
+            40,
+            116,
+            114,
+            117,
+            101,
+            41,
+            59,
+            47,
+            42,
+            39,
+            41,
+            32,
+            123,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            116,
+            104,
+            105,
+            115,
+            46,
+            108,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            83,
+            116,
+            97,
+            116,
+            117,
+            115,
+            32,
+            61,
+            32,
+            76,
+            73,
+            67,
+            69,
+            78,
+            83,
+            69,
+            95,
+            83,
+            84,
+            65,
+            84,
+            85,
+            83,
+            46,
+            107,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            69,
+            114,
+            114,
+            111,
+            114,
+            70,
+            108,
+            97,
+            103,
+            95,
+            78,
+            111,
+            76,
+            105,
+            99,
+            101,
+            110,
+            115,
+            101,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            106,
+            101,
+            99,
+            116,
+            40,
+            41,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            32,
+            114,
+            101,
+            116,
+            117,
+            114,
+            110,
+            59,
+            13,
+            10,
+            32,
+            32,
+            32,
+            32,
+            32,
+            42,
+            47
+        };
+
+        private static readonly byte[] Fin2019 = new byte[]
+        {
+            76,
+            141,
+            68,
+            36,
+            32,
+            72,
+            141,
+            85,
+            224,
+            72,
+            139,
+            206,
+            232,
+            195,
+            46,
+            0,
+            0,
+            132,
+            192,
+            65
+        };
+
+        private static readonly byte[] Rep2019 = new byte[]
+        {
+            76,
+            141,
+            68,
+            36,
+            32,
+            72,
+            141,
+            85,
+            224,
+            72,
+            139,
+            206,
+            232,
+            195,
+            46,
+            0,
+            0,
+            176,
+            1,
+            65
+        };
+        #endregion
 
         private IContainer components;
 
         private Label label1;
 
         private TextBox textBox1;
-
-        private Label label2;
-
-        private TextBox textBox2;
-
-        private Label label3;
-
-        private TextBox textBox3;
 
         private TextBox textBox4;
 
@@ -49,13 +818,9 @@ namespace UniPatcher
 
         private Button button2;
 
-        private Button button3;
-
-        private Button button4;
-
-        private Button button5;
-
         private TextBox textBox9;
+
+        private Button button6;
 
         public Form1()
         {
@@ -63,7 +828,7 @@ namespace UniPatcher
             this.button2.Enabled = false;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog
             {
@@ -86,66 +851,38 @@ namespace UniPatcher
                         throw new IOException("Application not found!");
                     }
                     this.appPath = folderBrowserDialog.SelectedPath + "/Unity.exe";
-                    if (FileVersionInfo.GetVersionInfo(this.appPath).FileVersion.Substring(0, 1) != "2")
+                    if (FileVersionInfo.GetVersionInfo(this.appPath).FileVersion.Substring(0, 4) != "2019")
                     {
-                        this.textBox2.Text = FileVersionInfo.GetVersionInfo(this.appPath).FileVersion.Substring(0, 5);
-                        this.button2.Enabled = true;
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(this.appPath);
-                        this.patchAs = int.Parse(versionInfo.FileVersion[0].ToString()) * 100;
-                        this.patchAs += int.Parse(versionInfo.FileVersion[2].ToString()) * 10;
-                        this.patchAs += int.Parse(versionInfo.FileVersion[4].ToString());
+                        this.button2.Enabled = false;
+                        throw new IOException("Not v2019!");
                     }
-                    else
+                    TextBox expr_E2 = this.textBox9;
+                    expr_E2.Text = expr_E2.Text + "Unity v2019 found. :)" + Environment.NewLine;
+                    if (!File.Exists("C:\\Program Files\\Unity Hub\\Unity Hub.exe"))
                     {
-                        this.textBox2.Text = FileVersionInfo.GetVersionInfo(this.appPath).FileVersion.Substring(0, 8);
-                        this.button2.Enabled = true;
-                        int num = int.Parse(FileVersionInfo.GetVersionInfo(this.appPath).FileVersion.Substring(5, 1));
-                        if (num > 0)
-                        {
-                            if (num == 1)
-                            {
-                                this.patchAs = 20171;
-                            }
-                            else
-                            {
-                                this.patchAs = 20172;
-                            }
-                        }
-                        else
-                        {
-                            this.patchAs = 2017;
-                        }
+                        TextBox expr_147 = this.textBox9;
+                        expr_147.Text = expr_147.Text + "Unity Hub not found. :(" + Environment.NewLine;
+                        TextBox expr_167 = this.textBox9;
+                        expr_167.Text = expr_167.Text + "Please install Unity Hub and start again!!!" + Environment.NewLine;
+                        throw new IOException("Unity Hub not installed!");
                     }
-                    this.PrintDebug();
+                    TextBox expr_10E = this.textBox9;
+                    expr_10E.Text = expr_10E.Text + "Unity Hub found. :)" + Environment.NewLine;
+                    this.button6.Enabled = true;
+                    this.patchAs = 2019;
                 }
-                catch (Exception arg_1F5_0)
+                catch (Exception arg_18E_0)
                 {
-                    MessageBox.Show(arg_1F5_0.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                    MessageBox.Show(arg_18E_0.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 }
             }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            string text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            Random random = new Random();
-            this.textBox4.Text = text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString();
-            this.textBox5.Text = text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString();
-            this.textBox6.Text = text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString();
-            this.textBox7.Text = text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString();
-            this.textBox8.Text = text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString() + text[random.Next(0, 36)].ToString();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            new Form2().ShowDialog();
         }
 
         private bool WriteLicenseToFile(string appDir, bool spfold, int version)
         {
             string text = string.Format("{0}-{1}-{2}-{3}-{4}", new object[]
             {
-                this.textBox3.Text,
+                "U3",
                 this.textBox4.Text,
                 this.textBox5.Text,
                 this.textBox6.Text,
@@ -156,381 +893,150 @@ namespace UniPatcher
                 MessageBox.Show("Invalid Key must be \"22\" chars.", string.Empty, MessageBoxButtons.OK);
                 return false;
             }
-            this.PrintDebug();
-            Console.WriteLine(version);
             List<byte> list = new List<byte>();
-            List<byte> arg_9D_0 = list;
-            byte[] expr_99 = new byte[4];
-            expr_99[0] = 1;
-            arg_9D_0.AddRange(expr_99);
+            List<byte> arg_8B_0 = list;
+            byte[] expr_87 = new byte[4];
+            expr_87[0] = 1;
+            arg_8B_0.AddRange(expr_87);
             list.AddRange(Encoding.ASCII.GetBytes(string.Format("{0}-{1}", text, this.textBox8.Text)));
-            if (version != 20172)
+            List<string> list2 = new List<string>
             {
-                List<string> list2 = new List<string>
+                "<root>",
+                "  <TimeStamp2 Value=\"cn/lkLOZ3vFvbQ==\"/>",
+                "  <TimeStamp Value=\"jWj8PXAeZMPzUw==\"/>",
+                "  <License id=\"Terms\">",
+                "    <ClientProvidedVersion Value=\"\"/>",
+                string.Format("    <DeveloperData Value=\"{0}\"/>", Convert.ToBase64String(list.ToArray())),
+                "    <Features>"
+            };
+            int[] array = LicHeader.ReadAll();
+            for (int i = 0; i < array.Length; i++)
+            {
+                int num = array[i];
+                list2.Add(string.Format("      <Feature Value=\"{0}\"/>", num));
+            }
+            list2.Add("    </Features>");
+            list2.Add("    <LicenseVersion Value=\"6.x\"/>");
+            list2.Add("    <MachineBindings>");
+            list2.Add("    </MachineBindings>");
+            list2.Add("    <MachineID Value=\"\"/>");
+            list2.Add("    <SerialHash Value=\"\"/>");
+            list2.Add(string.Format("    <SerialMasked Value=\"{0}-XXXX\"/>", text));
+            DateTime now = DateTime.Now;
+            list2.Add(string.Format("    <StartDate Value=\"{0}T00:00:00\"/>", now.AddDays(-1.0).ToString("yyyy-MM-dd")));
+            list2.Add("    <StopDate Value=\"\"/>");
+            list2.Add(string.Format("    <UpdateDate Value=\"{0}T00:00:00\"/>", now.AddYears(10).ToString("yyyy-MM-dd")));
+            list2.Add("  </License>");
+            list2.Add("");
+            list2.Add("<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">");
+            list2.Add("<SignedInfo>");
+            list2.Add("<CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments\"/>");
+            list2.Add("<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\"/>");
+            list2.Add("<Reference URI=\"#Terms\">");
+            list2.Add("<Transforms>");
+            list2.Add("<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>");
+            list2.Add("</Transforms>");
+            list2.Add("<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\"/>");
+            list2.Add("<DigestValue>oeMc1KScgy617DHMPTxbYhqNjIM=</DigestValue>");
+            list2.Add("</Reference>");
+            list2.Add("</SignedInfo>");
+            list2.Add("<SignatureValue>WuzMPTi0Ko1vffk9gf9ds/iU0b0K8UHaLpi4kWgm6q1am5MPTYYnzH1InaSWuzYo");
+            list2.Add("EpJThKspOZdO0JISeEolNdJVf3JpsY55OsD8UaruvhwZn4r9pLeNSC7SzQ1rvAWP");
+            list2.Add("h77XaHizhVVs15w6NYevP27LTxbZaem5L8Zs+34VKXQFeG4g0dEI/Jhl70TqE0CS");
+            list2.Add("YNF+D0zqEtyMNHsh0Rq/vPLSzPXUN12jfPLZ3dO9B+9/mG7Ljd6emZjjLZUVuSKQ");
+            list2.Add("uKxN5jlHZsm2kRMudijICV6YOWMPT+oZePlCg+BJQg5/xcN5aYVBDZhNeuNwQL1H");
+            list2.Add("MPT/GJPxVuETgd9k8c4uDg==</SignatureValue>");
+            list2.Add("</Signature>");
+            list2.Add("</root>");
+            string text2 = string.Empty;
+            if (spfold)
+            {
+                text2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Unity";
+                if (!Directory.Exists(text2))
                 {
-                    "<root>",
-                    "  <TimeStamp2 Value=\"cn/lkLOZ3vFvbQ==\"/>",
-                    "  <TimeStamp Value=\"jWj8PXAeZMPzUw==\"/>",
-                    "  <License id=\"Terms\">",
-                    "    <ClientProvidedVersion Value=\"\"/>",
-                    string.Format("    <DeveloperData Value=\"{0}\"/>", Convert.ToBase64String(list.ToArray())),
-                    "    <Features>"
-                };
-                int[] array = LicHeader.ReadAll();
-                for (int i = 0; i < array.Length; i++)
-                {
-                    int num = array[i];
-                    list2.Add(string.Format("      <Feature Value=\"{0}\"/>", num));
-                }
-                list2.Add("    </Features>");
-                if (version < 500)
-                {
-                    list2.Add("    <LicenseVersion Value=\"4.x\"/>");
-                }
-                if (version >= 500 && version < 2017)
-                {
-                    list2.Add("    <LicenseVersion Value=\"5.x\"/>");
-                }
-                if (version == 2017)
-                {
-                    list2.Add("    <LicenseVersion Value=\"2017.x\"/>");
-                }
-                if (version == 20171)
-                {
-                    list2.Add("    <LicenseVersion Value=\"6.x\"/>");
-                }
-                list2.Add("    <MachineBindings>");
-                list2.Add("    </MachineBindings>");
-                list2.Add("    <MachineID Value=\"\"/>");
-                list2.Add("    <SerialHash Value=\"\"/>");
-                list2.Add(string.Format("    <SerialMasked Value=\"{0}-XXXX\"/>", text));
-                DateTime now = DateTime.Now;
-                list2.Add(string.Format("    <StartDate Value=\"{0}T00:00:00\"/>", now.AddDays(-1.0).ToString("yyyy-MM-dd")));
-                list2.Add("    <StopDate Value=\"\"/>");
-                list2.Add(string.Format("    <UpdateDate Value=\"{0}T00:00:00\"/>", now.AddYears(10).ToString("yyyy-MM-dd")));
-                list2.Add("  </License>");
-                list2.Add("");
-                list2.Add("<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\">");
-                list2.Add("<SignedInfo>");
-                list2.Add("<CanonicalizationMethod Algorithm=\"http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments\"/>");
-                list2.Add("<SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\"/>");
-                list2.Add("<Reference URI=\"#Terms\">");
-                list2.Add("<Transforms>");
-                list2.Add("<Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>");
-                list2.Add("</Transforms>");
-                list2.Add("<DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\"/>");
-                list2.Add("<DigestValue>oeMc1KScgy617DHMPTxbYhqNjIM=</DigestValue>");
-                list2.Add("</Reference>");
-                list2.Add("</SignedInfo>");
-                list2.Add("<SignatureValue>WuzMPTi0Ko1vffk9gf9ds/iU0b0K8UHaLpi4kWgm6q1am5MPTYYnzH1InaSWuzYo");
-                list2.Add("EpJThKspOZdO0JISeEolNdJVf3JpsY55OsD8UaruvhwZn4r9pLeNSC7SzQ1rvAWP");
-                list2.Add("h77XaHizhVVs15w6NYevP27LTxbZaem5L8Zs+34VKXQFeG4g0dEI/Jhl70TqE0CS");
-                list2.Add("YNF+D0zqEtyMNHsh0Rq/vPLSzPXUN12jfPLZ3dO9B+9/mG7Ljd6emZjjLZUVuSKQ");
-                list2.Add("uKxN5jlHZsm2kRMudijICV6YOWMPT+oZePlCg+BJQg5/xcN5aYVBDZhNeuNwQL1H");
-                list2.Add("MPT/GJPxVuETgd9k8c4uDg==</SignatureValue>");
-                list2.Add("</Signature>");
-                list2.Add("</root>");
-                string text2 = "";
-                if (version < 500)
-                {
-                    text2 = "Unity_v4.x.ulf";
-                }
-                if (version >= 500 && version < 2017)
-                {
-                    text2 = "Unity_v5.x.ulf";
-                }
-                if (version == 2017)
-                {
-                    text2 = "Unity_v2017.x.ulf";
-                }
-                if (version == 20171)
-                {
-                    text2 = "Unity_lic.ulf";
-                }
-                string text3 = string.Empty;
-                if (spfold)
-                {
-                    text3 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Unity";
-                    if (!Directory.Exists(text3))
-                    {
-                        try
-                        {
-                            Directory.CreateDirectory(text3);
-                        }
-                        catch (Exception arg_3E0_0)
-                        {
-                            spfold = false;
-                            MessageBox.Show(arg_3E0_0.Message, string.Empty, MessageBoxButtons.OK);
-                        }
-                    }
-                }
-                if (spfold)
-                {
-                    if (File.Exists(text3 + "/" + text2))
-                    {
-                        spfold = this.TestAtr(text3 + "/" + text2);
-                        if (spfold && MessageBox.Show(string.Format("Replace the \"{0}\\{1}\"?", text3, text2), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.OK)
-                        {
-                            list2.Clear();
-                            return true;
-                        }
-                    }
-                    if (spfold)
-                    {
-                        try
-                        {
-                            if (version < 500)
-                            {
-                                text2 = "Unity_v4.x.ulf";
-                            }
-                            if (version >= 500 && version < 2017)
-                            {
-                                text2 = "Unity_v5.x.ulf";
-                            }
-                            if (version == 2017)
-                            {
-                                text2 = "Unity_v2017.x.ulf";
-                            }
-                            if (version == 20171)
-                            {
-                                text2 = "Unity_lic.ulf";
-                            }
-                            if (text2 == "Unity_lic.ulf")
-                            {
-                                using (FileStream fileStream = new FileStream(text3 + "/" + text2, FileMode.Append))
-                                {
-                                    foreach (string current in list2)
-                                    {
-                                        byte[] bytes = Encoding.ASCII.GetBytes(string.Format("{0}\r", current));
-                                        fileStream.Write(bytes, 0, bytes.Length);
-                                    }
-                                    fileStream.Flush();
-                                    fileStream.Close();
-                                    goto IL_540;
-                                }
-                            }
-                            File.WriteAllLines(text3 + "/" + text2, list2);
-                            IL_540:;
-                        }
-                        catch (Exception arg_545_0)
-                        {
-                            spfold = false;
-                            MessageBox.Show(arg_545_0.Message, string.Empty, MessageBoxButtons.OK);
-                        }
-                    }
-                }
-                if (!spfold)
-                {
-                    if (File.Exists(appDir + "/" + text2))
-                    {
-                        if (!this.TestAtr(appDir + "/" + text2))
-                        {
-                            list2.Clear();
-                            return false;
-                        }
-                        if (MessageBox.Show(string.Format("Replace the \"{0}\\{1}\"?", appDir, text2), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.OK)
-                        {
-                            list2.Clear();
-                            return true;
-                        }
-                    }
                     try
                     {
-                        if (version < 500)
+                        Directory.CreateDirectory(text2);
+                        goto IL_345;
+                    }
+                    catch (Exception arg_32F_0)
+                    {
+                        spfold = false;
+                        MessageBox.Show(arg_32F_0.Message, string.Empty, MessageBoxButtons.OK);
+                        goto IL_345;
+                    }
+                }
+                spfold = true;
+            }
+            IL_345:
+            string text3 = text2 + "\\Unity_lic.ulf";
+            if (spfold)
+            {
+                if (File.Exists(text3))
+                {
+                    File.Delete(text3);
+                }
+                if (spfold)
+                {
+                    try
+                    {
+                        if (text3 == text2 + "\\Unity_lic.ulf")
                         {
-                            text2 = "Unity_v4.x.ulf";
-                        }
-                        if (version >= 500 && version < 2017)
-                        {
-                            text2 = "Unity_v5.x.ulf";
-                        }
-                        if (version == 2017)
-                        {
-                            text2 = "Unity_v2017.x.ulf";
-                        }
-                        if (version == 20171)
-                        {
-                            text2 = "Unity_lic.ulf";
-                        }
-                        if (text2 == "Unity_lic.ulf")
-                        {
-                            using (FileStream fileStream2 = new FileStream(text3 + "/" + text2, FileMode.Append))
+                            using (FileStream fileStream = new FileStream(text3, FileMode.Append))
                             {
-                                foreach (string current2 in list2)
+                                foreach (string current in list2)
                                 {
-                                    byte[] bytes2 = Encoding.ASCII.GetBytes(string.Format("{0}\r", current2));
-                                    fileStream2.Write(bytes2, 0, bytes2.Length);
+                                    byte[] bytes = Encoding.ASCII.GetBytes(current + "\r");
+                                    fileStream.Write(bytes, 0, bytes.Length);
                                 }
-                                fileStream2.Flush();
-                                fileStream2.Close();
-                                goto IL_6A2;
+                                fileStream.Flush();
+                                fileStream.Close();
+                                goto IL_404;
                             }
                         }
-                        File.WriteAllLines(text3 + "/" + text2, list2);
-                        IL_6A2:;
+                        File.WriteAllLines(text3, list2);
+                        IL_404:;
                     }
-                    catch (Exception arg_6AA_0)
+                    catch (Exception arg_409_0)
                     {
-                        list2.Clear();
-                        MessageBox.Show(arg_6AA_0.Message, string.Empty, MessageBoxButtons.OK);
-                        bool result = false;
-                        return result;
+                        spfold = false;
+                        MessageBox.Show(arg_409_0.Message, string.Empty, MessageBoxButtons.OK);
                     }
                 }
-                list2.Clear();
-                return true;
             }
-            string text4 = string.Format("{0}-{1}-{2}-{3}-{4}-{5}", new object[]
+            if (!spfold)
             {
-                this.textBox3.Text,
-                this.textBox4.Text,
-                this.textBox5.Text,
-                this.textBox6.Text,
-                this.textBox7.Text,
-                this.textBox8.Text
-            });
-            int[] array2 = LicHeader.ReadAll();
-            if (text4.Length != 27)
-            {
-                MessageBox.Show("Invalid Key must be \"27\" chars.", string.Empty, MessageBoxButtons.OK);
-                return false;
-            }
-            string path = "Unity_lic.ulf";
-            string value = text4.Remove(text4.Length - 4, 4) + "XXXX";
-            byte[] expr_780 = new byte[4];
-            expr_780[0] = 1;
-            string value2 = Convert.ToBase64String(expr_780.Concat(Encoding.ASCII.GetBytes(text4)).ToArray<byte>().ToArray<byte>());
-            string value3 = "6.x";
-            string value4 = "false";
-            string value5 = "";
-            string value6 = DateTime.UtcNow.AddDays(-1.0).ToString("s", CultureInfo.InvariantCulture);
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            string value7 = "";
-            string value8 = "";
-            string value9 = "";
-            string value10 = "";
-            string value11 = DateTime.UtcNow.AddYears(10).ToString("s", CultureInfo.InvariantCulture);
-            MemoryStream memoryStream = new MemoryStream();
-            XmlWriterSettings settings = new XmlWriterSettings
-            {
-                Indent = true,
-                IndentChars = "  ",
-                NewLineChars = "\n",
-                OmitXmlDeclaration = true,
-                Encoding = Encoding.ASCII
-            };
-            using (XmlWriter xmlWriter = XmlWriter.Create(memoryStream, settings))
-            {
-                xmlWriter.WriteStartElement("root");
-                xmlWriter.WriteStartElement("License");
-                xmlWriter.WriteAttributeString("id", "Terms");
-                xmlWriter.WriteStartElement("AlwaysOnline");
-                xmlWriter.WriteAttributeString("Value", value4);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("ClientProvidedVersion");
-                xmlWriter.WriteAttributeString("Value", value5);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("DeveloperData");
-                xmlWriter.WriteAttributeString("Value", value2);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("Features");
-                int[] array = array2;
-                for (int i = 0; i < array.Length; i++)
+                if (File.Exists(text3))
                 {
-                    int num2 = array[i];
-                    xmlWriter.WriteStartElement("Feature");
-                    xmlWriter.WriteAttributeString("Value", num2.ToString());
-                    xmlWriter.WriteEndElement();
+                    File.Delete(text3);
                 }
-                xmlWriter.WriteFullEndElement();
-                xmlWriter.WriteStartElement("InitialActivationDate");
-                xmlWriter.WriteAttributeString("Value", value6);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("LicenseVersion");
-                xmlWriter.WriteAttributeString("Value", value3);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("MachineBindings");
-                foreach (KeyValuePair<string, string> current3 in dictionary)
+                try
                 {
-                    xmlWriter.WriteStartElement("Binding");
-                    xmlWriter.WriteAttributeString("Key", current3.Key);
-                    xmlWriter.WriteAttributeString("Value", current3.Value);
-                    xmlWriter.WriteEndElement();
+                    if (text3 == text2 + "\\Unity_lic.ulf")
+                    {
+                        using (FileStream fileStream2 = new FileStream(text3, FileMode.Append))
+                        {
+                            foreach (string current2 in list2)
+                            {
+                                byte[] bytes2 = Encoding.ASCII.GetBytes(current2 + "\r");
+                                fileStream2.Write(bytes2, 0, bytes2.Length);
+                            }
+                            fileStream2.Flush();
+                            fileStream2.Close();
+                            goto IL_4C8;
+                        }
+                    }
+                    File.WriteAllLines(text3, list2);
+                    IL_4C8:;
                 }
-                xmlWriter.WriteFullEndElement();
-                xmlWriter.WriteStartElement("MachineID");
-                xmlWriter.WriteAttributeString("Value", value7);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("SerialHash");
-                xmlWriter.WriteAttributeString("Value", value8);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("SerialMasked");
-                xmlWriter.WriteAttributeString("Value", value);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("StartDate");
-                xmlWriter.WriteAttributeString("Value", value9);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("StopDate");
-                xmlWriter.WriteAttributeString("Value", value10);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteStartElement("UpdateDate");
-                xmlWriter.WriteAttributeString("Value", value11);
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndElement();
-                xmlWriter.Flush();
-            }
-            memoryStream.Position = 0L;
-            XmlDocument xmlDocument = new XmlDocument
-            {
-                PreserveWhitespace = true
-            };
-            xmlDocument.Load(memoryStream);
-            SignedXml signedXml = new SignedXml(xmlDocument)
-            {
-                SigningKey = new RSACryptoServiceProvider()
-            };
-            Reference reference = new Reference
-            {
-                Uri = "#Terms"
-            };
-            reference.AddTransform(new XmlDsigEnvelopedSignatureTransform());
-            signedXml.AddReference(reference);
-            signedXml.ComputeSignature();
-            StringBuilder stringBuilder = new StringBuilder();
-            using (XmlWriter xmlWriter2 = XmlWriter.Create(stringBuilder, settings))
-            {
-                XmlDocument xmlDocument2 = new XmlDocument
+                catch (Exception arg_4D0_0)
                 {
-                    InnerXml = xmlDocument.InnerXml
-                };
-                XmlElement expr_B8D = xmlDocument2.DocumentElement;
-                if (expr_B8D != null)
-                {
-                    expr_B8D.AppendChild(xmlDocument2.ImportNode(signedXml.GetXml(), true));
+                    list2.Clear();
+                    MessageBox.Show(arg_4D0_0.Message, string.Empty, MessageBoxButtons.OK);
+                    return false;
                 }
-                xmlDocument2.Save(xmlWriter2);
-                xmlWriter2.Flush();
             }
-            string contents = stringBuilder.Replace(" />", "/>").ToString();
-            string text5 = spfold ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Unity") : appDir;
-            string text6 = Path.Combine(text5, path);
-            try
-            {
-                Directory.CreateDirectory(text5);
-                if (File.Exists(text6) && this.TestAtr(text6) && MessageBox.Show(string.Format("Replace the \"{0}\"?", text6), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                {
-                    bool result = true;
-                    return result;
-                }
-                File.WriteAllText(text6, contents);
-            }
-            catch (Exception arg_C49_0)
-            {
-                MessageBox.Show(arg_C49_0.Message, string.Empty, MessageBoxButtons.OK);
-                bool result = false;
-                return result;
-            }
+            list2.Clear();
             return true;
         }
 
@@ -589,7 +1095,7 @@ namespace UniPatcher
             return true;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
             if (this.textBox1.Text.Length < 3)
             {
@@ -605,35 +1111,10 @@ namespace UniPatcher
                 MessageBox.Show(arg_37_0.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            if (this.patchAs < 500)
-            {
-                this.WriteLicenseToFile(text, true, this.patchAs);
-                return;
-            }
-            if (this.patchAs >= 500 && this.patchAs < 529)
-            {
-                this.WriteLicenseToFile(text, true, this.patchAs);
-                return;
-            }
-            if (this.patchAs >= 530 && this.patchAs < 2017)
-            {
-                this.WriteLicenseToFile(text, true, this.patchAs);
-                return;
-            }
-            if (this.patchAs == 2017)
-            {
-                this.WriteLicenseToFile(text, true, 2017);
-                return;
-            }
-            if (this.patchAs == 20171)
-            {
-                this.WriteLicenseToFile(text, true, 20171);
-                return;
-            }
-            this.WriteLicenseToFile(text, true, 20172);
+            this.WriteLicenseToFile(text, true, 2019);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             if (this.textBox1.Text.Length < 3)
             {
@@ -652,54 +1133,29 @@ namespace UniPatcher
                 MessageBox.Show(arg_49_0.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Hand);
                 return;
             }
-            File.Copy(text + "/Unity.exe", text + "/Unity.exe.bak", true);
+            if (!File.Exists(text + "/Unity.exe.bak"))
+            {
+                File.Copy(text + "/Unity.exe", text + "/Unity.exe.bak", true);
+            }
             NLogger.Clear();
-            string se = "";
-            string rep = "";
-            string se2 = "";
-            string rep2 = "";
-            if (this.patchAs < 530)
-            {
-                se = "CC 55 8B EC 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                rep = "CC B0 01 C3 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                se2 = "CC 40 57 48 83 EC 30 80 79 ?? ?? 48 8B F9 75 ??";
-                rep2 = "CC B0 01 C3 90 90 90 80 79 ?? ?? 48 8B F9 75 ??";
-            }
-            if (this.patchAs >= 530 && this.patchAs < 20172)
-            {
-                se = "CC 55 8B EC 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                rep = "CC B0 01 C3 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                se2 = "CC 40 57 48 83 EC 30 80 79 ?? ?? 48 8B F9 75 ??";
-                rep2 = "CC B0 01 C3 90 90 90 80 79 ?? ?? 48 8B F9 75 ??";
-            }
-            if (this.patchAs >= 20172)
-            {
-                se = "CC 55 8B EC 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                rep = "CC B0 01 C3 83 EC ?? 53 56 8B F1 80 7E ?? ?? 57 75 ??";
-                se2 = "CC 48 89 5C 24 10 48 89 6C 24 18 56 41 54 41 55 ?? 83 EC 30 ?? 8B E9";
-                rep2 = "CC B0 01 C3 90 90 48 89 6C 24 18 56 41 54 41 55 ?? 83 EC 30 ?? 8B E9";
-            }
+            string se = "4C 8D 44 24 20 48 8D 55 E0 48 8B CE E8 ?? ?? 00 00 84 C0 41";
+            string rep = "4C 8D 44 24 20 48 8D 55 E0 48 8B CE E8 ?? ?? 00 00 B0 01 41";
             Patcher patcher = new Patcher(text + "/Unity.exe");
+            patcher.Patterns.Clear();
             if (patcher.AddString(se, rep, 1u, 0u))
             {
                 if (patcher.Patch())
                 {
-                    NLogger.LastMessage();
+                    TextBox expr_D6 = this.textBox9;
+                    expr_D6.Text = expr_D6.Text + "Unity patched successfully. :)   License being re-written." + Environment.NewLine;
                     this.WriteLicenseToFile(text, true, this.patchAs);
+                    TextBox expr_105 = this.textBox9;
+                    expr_105.Text = expr_105.Text + "License written. Enjoy :)" + Environment.NewLine;
                     return;
                 }
-                if (this.patchAs >= 500)
-                {
-                    patcher.Patterns.Clear();
-                    if (patcher.AddString(se2, rep2, 1u, 0u) && patcher.Patch())
-                    {
-                        NLogger.LastMessage();
-                        this.WriteLicenseToFile(text, true, this.patchAs);
-                        return;
-                    }
-                }
+                TextBox expr_126 = this.textBox9;
+                expr_126.Text = expr_126.Text + "Unity patching failed. Already patched or unpatchable!!!" + Environment.NewLine;
             }
-            NLogger.LastMessage();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -724,6 +1180,171 @@ namespace UniPatcher
             Console.WriteLine(this.patchAs);
         }
 
+        private void Button6_Click(object sender, EventArgs e)
+        {
+            if (Form1.FindBytes("C:\\Program Files\\Unity Hub\\resources\\app.asar", Form1.Rep1) != -1)
+            {
+                TextBox expr_18 = this.textBox9;
+                expr_18.Text = expr_18.Text + "Unity Hub already patched. :)   Now fix Unity." + Environment.NewLine;
+                this.button6.Enabled = false;
+                this.button2.Enabled = true;
+                return;
+            }
+            Form1.PatchASAR1("C:\\Program Files\\Unity Hub\\resources\\app.asar");
+            Form1.PatchASAR2("C:\\Program Files\\Unity Hub\\resources\\app.asar");
+            TextBox expr_65 = this.textBox9;
+            expr_65.Text = expr_65.Text + "Unity Hub patched successfully. :)   Now fix Unity." + Environment.NewLine;
+            this.button6.Enabled = false;
+            this.button2.Enabled = true;
+        }
+
+        private void NewPatching()
+        {
+            string text = this.textBox1.Text + "\\Unity.exe";
+            if (Form1.FindBytes(text, Form1.Rep2019) != -1)
+            {
+                TextBox expr_2A = this.textBox9;
+                expr_2A.Text = expr_2A.Text + "Unity already patched. :)   License being re-written." + Environment.NewLine;
+                this.WriteLicenseToFile(text, true, 2019);
+                TextBox expr_58 = this.textBox9;
+                expr_58.Text = expr_58.Text + "License re-written. Enjoy :)" + Environment.NewLine;
+                return;
+            }
+            if (Form1.FindBytes(text, Form1.Fin2019) != -1)
+            {
+                Form1.Patch2019(text);
+                TextBox expr_8D = this.textBox9;
+                expr_8D.Text = expr_8D.Text + "Unity patched successfully. :)   License being re-written." + Environment.NewLine;
+                this.WriteLicenseToFile(text, true, 2019);
+                TextBox expr_BB = this.textBox9;
+                expr_BB.Text = expr_BB.Text + "License written. Enjoy :)" + Environment.NewLine;
+                return;
+            }
+            TextBox expr_DC = this.textBox9;
+            expr_DC.Text = expr_DC.Text + "Pattern not found!" + Environment.NewLine;
+        }
+
+        private static int FindBytes(string fileTarget, byte[] sequence)
+        {
+            byte[] array = File.ReadAllBytes(fileTarget);
+            int i = 0;
+            int num = array.Length - sequence.Length;
+            byte b = sequence[0];
+            while (i < num)
+            {
+                if (array[i] == b)
+                {
+                    int num2 = 1;
+                    while (num2 < sequence.Length && array[i + num2] == sequence[num2])
+                    {
+                        if (num2 == sequence.Length - 1)
+                        {
+                            return i;
+                        }
+                        num2++;
+                    }
+                }
+                i++;
+            }
+            return -1;
+        }
+
+        private static bool DetectPatch1(byte[] sequence, int position)
+        {
+            if (position + Form1.Fin1.Length > sequence.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < Form1.Fin1.Length; i++)
+            {
+                if (Form1.Fin1[i] != sequence[position + i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static void PatchASAR1(string originalFile)
+        {
+            byte[] array = File.ReadAllBytes(originalFile);
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (Form1.DetectPatch1(array, i))
+                {
+                    for (int j = 0; j < Form1.Fin1.Length; j++)
+                    {
+                        array[i + j] = Form1.Rep1[j];
+                    }
+                }
+            }
+            File.WriteAllBytes(originalFile, array);
+        }
+
+        private static bool DetectPatch2(byte[] sequence, int position)
+        {
+            if (position + Form1.Fin2.Length > sequence.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < Form1.Fin2.Length; i++)
+            {
+                if (Form1.Fin2[i] != sequence[position + i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static void PatchASAR2(string originalFile)
+        {
+            byte[] array = File.ReadAllBytes(originalFile);
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (Form1.DetectPatch2(array, i))
+                {
+                    for (int j = 0; j < Form1.Fin2.Length; j++)
+                    {
+                        array[i + j] = Form1.Rep2[j];
+                    }
+                }
+            }
+            File.WriteAllBytes(originalFile, array);
+        }
+
+        private static bool DetectPatch2019(byte[] sequence, int position)
+        {
+            if (position + Form1.Fin2019.Length > sequence.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < Form1.Fin2019.Length; i++)
+            {
+                if (Form1.Fin2019[i] != sequence[position + i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private static void Patch2019(string originalFile)
+        {
+            byte[] array = File.ReadAllBytes(originalFile);
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (Form1.DetectPatch2019(array, i))
+                {
+                    for (int j = 0; j < Form1.Fin2019.Length; j++)
+                    {
+                        array[i + j] = Form1.Rep2019[j];
+                    }
+                }
+            }
+            File.WriteAllBytes(originalFile, array);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && this.components != null)
@@ -738,10 +1359,6 @@ namespace UniPatcher
             ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof(Form1));
             this.label1 = new Label();
             this.textBox1 = new TextBox();
-            this.label2 = new Label();
-            this.textBox2 = new TextBox();
-            this.label3 = new Label();
-            this.textBox3 = new TextBox();
             this.textBox4 = new TextBox();
             this.textBox5 = new TextBox();
             this.textBox6 = new TextBox();
@@ -749,17 +1366,15 @@ namespace UniPatcher
             this.textBox8 = new TextBox();
             this.button1 = new Button();
             this.button2 = new Button();
-            this.button3 = new Button();
-            this.button4 = new Button();
-            this.button5 = new Button();
             this.textBox9 = new TextBox();
+            this.button6 = new Button();
             base.SuspendLayout();
             this.label1.AutoSize = true;
             this.label1.Location = new Point(13, 13);
             this.label1.Name = "label1";
-            this.label1.Size = new Size(194, 18);
+            this.label1.Size = new Size(251, 18);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Folder containing Unity.exe";
+            this.label1.Text = "Folder containing Unity.exe (v2019)";
             this.textBox1.Enabled = false;
             this.textBox1.Location = new Point(16, 35);
             this.textBox1.Name = "textBox1";
@@ -767,36 +1382,8 @@ namespace UniPatcher
             this.textBox1.TabIndex = 1;
             this.textBox1.TabStop = false;
             this.textBox1.Text = "Unity folder not selected yet !";
-            this.label2.AutoSize = true;
-            this.label2.Location = new Point(12, 69);
-            this.label2.Name = "label2";
-            this.label2.Size = new Size(131, 18);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Version Selected:";
-            this.textBox2.Enabled = false;
-            this.textBox2.Location = new Point(16, 90);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new Size(170, 26);
-            this.textBox2.TabIndex = 3;
-            this.textBox2.TabStop = false;
-            this.textBox2.Text = "?";
-            this.textBox2.TextAlign = HorizontalAlignment.Center;
-            this.label3.AutoSize = true;
-            this.label3.Location = new Point(12, 124);
-            this.label3.Name = "label3";
-            this.label3.Size = new Size(112, 18);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Serial Number:";
-            this.textBox3.Enabled = false;
-            this.textBox3.Location = new Point(16, 145);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.ReadOnly = true;
-            this.textBox3.Size = new Size(28, 26);
-            this.textBox3.TabIndex = 5;
-            this.textBox3.TabStop = false;
-            this.textBox3.Text = "U3";
             this.textBox4.Enabled = false;
-            this.textBox4.Location = new Point(50, 145);
+            this.textBox4.Location = new Point(647, 36);
             this.textBox4.Name = "textBox4";
             this.textBox4.ReadOnly = true;
             this.textBox4.Size = new Size(65, 26);
@@ -804,7 +1391,7 @@ namespace UniPatcher
             this.textBox4.TabStop = false;
             this.textBox4.Text = "AAAA";
             this.textBox5.Enabled = false;
-            this.textBox5.Location = new Point(121, 145);
+            this.textBox5.Location = new Point(647, 66);
             this.textBox5.Name = "textBox5";
             this.textBox5.ReadOnly = true;
             this.textBox5.Size = new Size(65, 26);
@@ -812,7 +1399,7 @@ namespace UniPatcher
             this.textBox5.TabStop = false;
             this.textBox5.Text = "AAAA";
             this.textBox6.Enabled = false;
-            this.textBox6.Location = new Point(192, 145);
+            this.textBox6.Location = new Point(647, 98);
             this.textBox6.Name = "textBox6";
             this.textBox6.ReadOnly = true;
             this.textBox6.Size = new Size(65, 26);
@@ -820,7 +1407,7 @@ namespace UniPatcher
             this.textBox6.TabStop = false;
             this.textBox6.Text = "AAAA";
             this.textBox7.Enabled = false;
-            this.textBox7.Location = new Point(263, 145);
+            this.textBox7.Location = new Point(647, 130);
             this.textBox7.Name = "textBox7";
             this.textBox7.ReadOnly = true;
             this.textBox7.Size = new Size(65, 26);
@@ -828,7 +1415,7 @@ namespace UniPatcher
             this.textBox7.TabStop = false;
             this.textBox7.Text = "AAAA";
             this.textBox8.Enabled = false;
-            this.textBox8.Location = new Point(334, 145);
+            this.textBox8.Location = new Point(647, 162);
             this.textBox8.Name = "textBox8";
             this.textBox8.ReadOnly = true;
             this.textBox8.Size = new Size(65, 26);
@@ -842,41 +1429,17 @@ namespace UniPatcher
             this.button1.TabStop = false;
             this.button1.Text = "Browse";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new EventHandler(this.button1_Click);
-            this.button2.Location = new Point(405, 177);
+            this.button1.Click += new EventHandler(this.Button1_Click);
+            this.button2.Location = new Point(406, 143);
             this.button2.Name = "button2";
-            this.button2.Size = new Size(152, 155);
+            this.button2.Size = new Size(152, 80);
             this.button2.TabIndex = 12;
             this.button2.TabStop = false;
-            this.button2.Text = "PATCH";
+            this.button2.Text = "2nd... Fix Unity";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new EventHandler(this.button2_Click);
-            this.button3.Location = new Point(405, 89);
-            this.button3.Name = "button3";
-            this.button3.Size = new Size(152, 26);
-            this.button3.TabIndex = 13;
-            this.button3.TabStop = false;
-            this.button3.Text = "Create License";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new EventHandler(this.button3_Click);
-            this.button4.Location = new Point(405, 145);
-            this.button4.Name = "button4";
-            this.button4.Size = new Size(152, 26);
-            this.button4.TabIndex = 14;
-            this.button4.TabStop = false;
-            this.button4.Text = "<<< Randomize";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new EventHandler(this.button4_Click);
-            this.button5.Location = new Point(247, 90);
-            this.button5.Name = "button5";
-            this.button5.Size = new Size(152, 26);
-            this.button5.TabIndex = 15;
-            this.button5.TabStop = false;
-            this.button5.Text = "License Options...";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new EventHandler(this.button5_Click);
+            this.button2.Click += new EventHandler(this.Button2_Click);
             this.textBox9.Font = new Font("Arial", 10f, FontStyle.Regular, GraphicsUnit.Point, 0);
-            this.textBox9.Location = new Point(16, 177);
+            this.textBox9.Location = new Point(17, 68);
             this.textBox9.Multiline = true;
             this.textBox9.Name = "textBox9";
             this.textBox9.ReadOnly = true;
@@ -884,15 +1447,21 @@ namespace UniPatcher
             this.textBox9.Size = new Size(383, 155);
             this.textBox9.TabIndex = 18;
             this.textBox9.TabStop = false;
-            this.textBox9.Text = "Requirements: .NET v4.0\r\n\r\nUpdates see here :\r\nhttps://forum.cgpersia.com/f13/unity-v4-x-x-v5-x-x-v2017-x-x-updates-win-mac-medicines-updated-regularly-99173/\r\n\r\ncredit: \"for_file\"  - for helping.";
+            this.textBox9.Text = "This release of UniPatcher is for Unity v2019.x.x ONLY.\r\n\r\n";
+            this.button6.Enabled = false;
+            this.button6.Location = new Point(406, 68);
+            this.button6.Name = "button6";
+            this.button6.Size = new Size(151, 69);
+            this.button6.TabIndex = 19;
+            this.button6.Text = "1st... Fix Hub";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new EventHandler(this.Button6_Click);
             base.AutoScaleDimensions = new SizeF(9f, 18f);
             base.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = SystemColors.InactiveCaption;
-            base.ClientSize = new Size(574, 344);
+            base.ClientSize = new Size(567, 231);
+            base.Controls.Add(this.button6);
             base.Controls.Add(this.textBox9);
-            base.Controls.Add(this.button5);
-            base.Controls.Add(this.button4);
-            base.Controls.Add(this.button3);
             base.Controls.Add(this.button2);
             base.Controls.Add(this.button1);
             base.Controls.Add(this.textBox8);
@@ -900,10 +1469,6 @@ namespace UniPatcher
             base.Controls.Add(this.textBox6);
             base.Controls.Add(this.textBox5);
             base.Controls.Add(this.textBox4);
-            base.Controls.Add(this.textBox3);
-            base.Controls.Add(this.label3);
-            base.Controls.Add(this.textBox2);
-            base.Controls.Add(this.label2);
             base.Controls.Add(this.textBox1);
             base.Controls.Add(this.label1);
             this.Font = new Font("Arial", 12f, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -915,7 +1480,7 @@ namespace UniPatcher
             base.Name = "Form1";
             base.SizeGripStyle = SizeGripStyle.Hide;
             base.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Unity Pro Universal Patcher v2017.6 (aug2017)";
+            this.Text = "UniPatcher v3 (for v2019 x64)";
             base.Load += new EventHandler(this.Form1_Load);
             base.ResumeLayout(false);
             base.PerformLayout();

@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <ProjectGuid>{60C13782-E7C9-41C4-BE8D-714EDEA0C779}</ProjectGuid>
+    <ProjectGuid>{3935A2C6-866E-4F99-AF0F-3961FA4481FB}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>WinExe</OutputType>
@@ -37,7 +37,6 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LicHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.cs" />
     <Compile Include="Properties\Settings.cs" />
@@ -50,6 +49,7 @@
     <Compile Include="UniPatcher\Form3.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UniPatcher\LicHeader.cs" />
     <Compile Include="UniPatcher\NLogger.cs" />
     <Compile Include="UniPatcher\Patcher.cs" />
     <Compile Include="UniPatcher\Program.cs" />
